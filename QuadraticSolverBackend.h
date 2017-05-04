@@ -16,6 +16,8 @@ public:
 	 * @param objective A quadratic objective.
 	 */
 	virtual void setObjective(const QuadraticObjective& objective) = 0;
+
+	using LinearSolverBackend::setObjective;
 };
 
 #endif // INFERENCE_QUADRATIC_SOLVER_BACKEND_H__

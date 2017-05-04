@@ -7,7 +7,7 @@ class LinearObjective : public QuadraticObjective {
 
 public:
 
-	LinearObjective(unsigned int size = 0) : QuadraticObjective(size) {}
+	explicit LinearObjective(unsigned int size = 0) : QuadraticObjective(size) {}
 
 private:
 

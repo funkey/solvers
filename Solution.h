@@ -1,11 +1,9 @@
 #ifndef INFERENCE_SOLUTION_H__
 #define INFERENCE_SOLUTION_H__
 
-#include <pipeline/all.h>
+#include <vector>
 
-struct NoSolutionException : virtual Exception {};
-
-class Solution : public pipeline::Data {
+class Solution {
 
 public:
 
@@ -19,11 +17,17 @@ public:
 
 	double& operator[](unsigned int i) { return _solution[i]; }
 
-	std::vector<double>& getVector() { return _solution; }
+	const std::vector<double>& getVector() const { return _solution; }
+
+	void setValue(double value) { _value = value; }
+
+	double getValue() const { return _value; }
 
 private:
 
 	std::vector<double> _solution;
+
+	double _value;
 };
 
 #endif // INFERENCE_SOLUTION_H__

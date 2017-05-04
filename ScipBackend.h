@@ -1,25 +1,21 @@
-#ifndef GUROBI_SOLVER_H__
-#define GUROBI_SOLVER_H__
+#ifndef SCIP_SOLVER_H__
+#define SCIP_SOLVER_H__
 
-#ifdef HAVE_GUROBI
+#include <config.h>
+#ifdef HAVE_SCIP
 
 #include <string>
 
-extern "C" {
-#include <gurobi_c.h>
-}
+#include <scip/scip.h>
 
 #include "LinearConstraints.h"
 #include "QuadraticObjective.h"
 #include "QuadraticSolverBackend.h"
 #include "Sense.h"
 #include "Solution.h"
-#include <util/exceptions.h>
-
-class GurobiException : public Exception {};
 
 /**
- * Gurobi interface to solve the following (integer) quadratic program:
+ * Scip interface to solve the following (integer) quadratic program:
  *
  * min  <a,x> + xQx
  * s.t. Ax  == b
@@ -31,13 +27,13 @@ class GurobiException : public Exception {};
  * vector denoting the coefficients of the objective and Q a PSD matrix giving
  * the quadratic coefficients of the objective.
  */
-class GurobiBackend : public QuadraticSolverBackend {
+class ScipBackend : public QuadraticSolverBackend {
 
 public:
 
-	GurobiBackend();
+	ScipBackend();
 
-	virtual ~GurobiBackend();
+	virtual ~ScipBackend();
 
 	///////////////////////////////////
 	// solver backend implementation //
@@ -75,42 +71,30 @@ private:
 	// internal //
 	//////////////
 
-	// dump the current problem to a file
-	void dumpProblem(std::string filename);
-
-	// set the optimality gap
-	void setMIPGap(double gap);
-
-	// set the mpi focus
-	void setMIPFocus(unsigned int focus);
-
-	// set a timeout
-	void setTimeout(double timeout);
-
-	// set the number of threads to use
-	void setNumThreads(unsigned int numThreads);
-
-	// enable solver output
+	/**
+	 * Enable solver output.
+	 */
 	void setVerbose(bool verbose);
 
-	// check error status and throw exception, used by our macro GRB_CHECK
-	void grbCheck(const char* call, const char* file, int line, int error);
+	void freeVariables();
+
+	void freeConstraints();
+
+	SCIP_VARTYPE scipVarType(VariableType type, double& lb, double& ub);
 
 	// size of a and x
 	unsigned int _numVariables;
 
-	// number of rows in A and C
-	unsigned int _numConstraints;
+	SCIP* _scip;
 
-	// the GRB environment
-	GRBenv* _env;
+	std::vector<SCIP_VAR*> _variables;
 
-	// the GRB model containing the objective and constraints
-	GRBmodel* _model;
+	std::vector<SCIP_CONS*> _constraints;
 };
 
-#endif // HAVE_GUROBI
+#endif // HAVE_SCIP
 
-#endif // GUROBI_SOLVER_H__
+#endif // SCIP_SOLVER_H__
+
 
 

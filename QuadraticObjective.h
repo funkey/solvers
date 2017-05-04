@@ -2,12 +2,12 @@
 #define INFERENCE_QUADRATIC_OBJECTIVE_H__
 
 #include <map>
+#include <vector>
 #include <utility>
 
-#include <pipeline/all.h>
 #include "Sense.h"
 
-class QuadraticObjective : public pipeline::Data {
+class QuadraticObjective {
 
 public:
 
@@ -16,7 +16,7 @@ public:
 	 *
 	 * @param size The number of coefficients in the objective.
 	 */
-	QuadraticObjective(unsigned int size = 0);
+	explicit QuadraticObjective(unsigned int size = 0);
 
 	/**
 	 * Set the constant value of the expression.

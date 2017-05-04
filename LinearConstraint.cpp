@@ -1,4 +1,3 @@
-#include <util/foreach.h>
 #include "LinearConstraint.h"
 
 LinearConstraint::LinearConstraint() :
@@ -24,6 +23,28 @@ LinearConstraint::setRelation(Relation relation) {
 
 	_relation = relation;
 }
+
+bool LinearConstraint::isViolated(const Solution & solution){
+
+    double s = 0;
+
+    for(const auto & kv : _coefs){
+        const auto var = kv.first;
+        const auto coef = kv.second;
+        const auto sol = solution[var];
+        s+= coef*sol;
+    }
+    if(_relation == LessEqual){
+        return s > _value;
+    }
+    else if(_relation == GreaterEqual){
+        return s < _value;
+    }
+    else{
+        return s != _value;
+    }
+}
+
 
 void
 LinearConstraint::setValue(double value) {
@@ -51,7 +72,8 @@ LinearConstraint::getValue() const {
 
 std::ostream& operator<<(std::ostream& out, const LinearConstraint& constraint) {
 
-	for (const auto& pair : constraint.getCoefficients())
+	typedef std::map<unsigned int, double>::value_type pair_t;
+	for (const pair_t& pair : constraint.getCoefficients())
 		out << pair.second << "*" << pair.first << " ";
 
 	out << (constraint.getRelation() == LessEqual ? "<=" : (constraint.getRelation() == GreaterEqual ? ">=" : "=="));

@@ -1,10 +1,9 @@
 #ifndef INFERENCE_LINEAR_CONSTRAINTS_H__
 #define INFERENCE_LINEAR_CONSTRAINTS_H__
 
-#include <pipeline/all.h>
 #include "LinearConstraint.h"
 
-class LinearConstraints : public pipeline::Data {
+class LinearConstraints {
 
 	typedef std::vector<LinearConstraint> linear_constraints_type;
 
@@ -42,11 +41,6 @@ public:
 	 * @param linearConstraints The set of linear constraints to add.
 	 */
 	void addAll(const LinearConstraints& linearConstraints);
-
-	/**
-	* Removes the last added linear constraint.
-	*/
-	void removeLastConstraint();
 
 	/**
 	 * @return The number of linear constraints in this set.

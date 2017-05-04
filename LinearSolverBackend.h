@@ -1,6 +1,7 @@
 #ifndef INFERENCE_LINEAR_SOLVER_BACKEND_H__
 #define INFERENCE_LINEAR_SOLVER_BACKEND_H__
 
+#include <util/exceptions.h>
 #include "LinearObjective.h"
 #include "LinearConstraints.h"
 #include "Solution.h"
@@ -57,6 +58,13 @@ public:
 	virtual void setConstraints(const LinearConstraints& constraints) = 0;
 
 	/**
+	 * Add a single constraint.
+	 *
+	 * @param constraint A linear constraints.
+	 */
+	virtual void addConstraint(const LinearConstraint& constraint) = 0;
+
+	/**
 	 * Solve the problem.
 	 *
 	 * @param solution A solution object to write the solution to.
@@ -64,8 +72,10 @@ public:
 	 * @param message A status message from the solver.
 	 * @return true, if the optimal value was found.
 	 */
-	virtual bool solve(Solution& solution, double& value, std::string& message) = 0;
+	virtual bool solve(Solution& solution, std::string& message) = 0;
 };
+
+class LinearSolverBackendException : public Exception {};
 
 #endif // INFERENCE_LINEAR_SOLVER_BACKEND_H__
 

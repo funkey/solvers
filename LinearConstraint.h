@@ -5,7 +5,7 @@
 #include <ostream>
 
 #include "Relation.h"
-
+#include <solver/Solution.h>
 /**
  * A sparse linear constraint.
  */
@@ -26,6 +26,8 @@ public:
 	const Relation& getRelation() const;
 
 	double getValue() const;
+
+    bool isViolated(const Solution & solution);
 
 private:
 

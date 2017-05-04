@@ -1,14 +1,14 @@
 #ifndef QUADRATIC_PROGRAM_SOLVER_FACTORY_H__
 #define QUADRATIC_PROGRAM_SOLVER_FACTORY_H__
 
-// forward declaration
-class QuadraticSolverBackend;
+#include "QuadraticSolverBackend.h"
+#include "BackendPreference.h"
 
 class QuadraticSolverBackendFactory {
 
 public:
 
-	virtual QuadraticSolverBackend* createQuadraticSolverBackend() const = 0;
+	virtual QuadraticSolverBackend* createQuadraticSolverBackend(Preference preference = Any) const = 0;
 };
 
 #endif // QUADRATIC_PROGRAM_SOLVER_FACTORY_H__
