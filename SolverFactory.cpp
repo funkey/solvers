@@ -43,15 +43,15 @@ SolverFactory::createLinearSolverBackend(Preference preference) const {
 
 	// use program options, if we were not forced to use a particular solver 
 	// already
-	if (preference == Any) {
+	//if (preference == Any) {
 
 		//if (optionUseGurobi)
 			//preference = Gurobi;
 		//if (optionUseCplex)
 			//preference = Cplex;
 		//if (optionUseScip)
-			preference = Scip;
-	}
+			//preference = Scip;
+	//}
 
 // by default, create a gurobi backend
 #ifdef HAVE_GUROBI
@@ -92,13 +92,13 @@ SolverFactory::createQuadraticSolverBackend(Preference preference) const {
 
 	// use program options, if we were not forced to use a particular solver 
 	// already
-	if (preference == Any) {
+	//if (preference == Any) {
 
 		//if (optionUseGurobi)
-			preference = Gurobi;
+			//preference = Gurobi;
 		//if (optionUseCplex)
 			//preference = Cplex;
-	}
+	//}
 
 // by default, create a gurobi backend
 #ifdef HAVE_GUROBI
