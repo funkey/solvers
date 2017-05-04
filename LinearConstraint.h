@@ -5,7 +5,7 @@
 #include <ostream>
 
 #include "Relation.h"
-#include <solver/Solution.h>
+#include "Solution.h"
 /**
  * A sparse linear constraint.
  */
