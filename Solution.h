@@ -23,11 +23,17 @@ public:
 
 	double getValue() const { return _value; }
 
+	void setTime(double time) { _time = time; }
+
+	double getTime() const { return _time; }
+
 private:
 
 	std::vector<double> _solution;
 
 	double _value;
+
+	double _time;
 };
 
 #endif // INFERENCE_SOLUTION_H__

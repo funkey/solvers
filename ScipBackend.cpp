@@ -1,3 +1,5 @@
+#include <boost/timer/timer.hpp>
+#include <boost/chrono.hpp>
 #include <config.h>
 
 #ifdef HAVE_SCIP
@@ -188,8 +190,15 @@ ScipBackend::solve(Solution& x, std::string& msg) {
 
 	LOG_ALL(sciplog) << "solving model" << std::endl;
 
+	boost::timer::cpu_timer timer;
+	timer.start();
+
 	SCIP_CALL_ABORT(SCIPpresolve(_scip));
 	SCIP_CALL_ABORT(SCIPsolve(_scip));
+
+	boost::chrono::nanoseconds ns(timer.elapsed().system + timer.elapsed().user);
+	double seconds = boost::chrono::duration<double>(ns).count();
+	x.setTime(seconds);
 
 	if (SCIPgetNSols(_scip) == 0) {
 

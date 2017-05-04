@@ -1,3 +1,5 @@
+#include <boost/timer/timer.hpp>
+#include <boost/chrono.hpp>
 #include <config.h>
 
 #ifdef HAVE_GUROBI
@@ -96,7 +98,7 @@ GurobiBackend::initialize(
 	//if (optionGurobiMIPFocus.as<unsigned int>() <= 3)
 		//setMIPFocus(optionGurobiMIPFocus.as<unsigned int>());
 	//else
-		//LOG_ERROR(gurobilog) << "Invalid value for MPI focus!" << std::endl;
+		//LOG_ERROR(gurobilog) << "Invalid value for MIP focus!" << std::endl;
 
 	//if (optionGurobiTimeout)
 		//setTimeout(optionGurobiTimeout.as<double>());
@@ -267,7 +269,14 @@ GurobiBackend::solve(Solution& x, std::string& msg) {
 
 	GRB_CHECK(GRBupdatemodel(_model));
 
+	boost::timer::cpu_timer timer;
+	timer.start();
+
 	GRB_CHECK(GRBoptimize(_model));
+
+	boost::chrono::nanoseconds ns(timer.elapsed().system + timer.elapsed().user);
+	double seconds = boost::chrono::duration<double>(ns).count();
+	x.setTime(seconds);
 
 	int status;
 	GRB_CHECK(GRBgetintattr(_model, GRB_INT_ATTR_STATUS, &status));
