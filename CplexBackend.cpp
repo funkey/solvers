@@ -26,7 +26,8 @@ CplexBackend::CplexBackend(const Parameter& parameter) :
     c_(env_),
     obj_(env_),
     sol_(env_),
-    firstRun_(true)
+    firstRun_(true),
+    timeout_(0)
 {
     LOG_DEBUG(cplexlog) << "constructing cplex solver" << std::endl;
 }
@@ -230,6 +231,9 @@ CplexBackend::solve(Solution& x,/* double& value, */ std::string& msg) {
             LOG_ERROR(cplexlog) << "Invalid value for MIP focus!" << std::endl;
 
         setNumThreads(_parameter.numThreads);
+
+		if (timeout_ > 0)
+			cplex_.setParam(IloCplex::TiLim, timeout_);
 
 		boost::timer::cpu_timer timer;
 		timer.start();

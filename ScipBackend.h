@@ -56,6 +56,8 @@ public:
 
 	void addConstraint(const LinearConstraint& constraint);
 
+	void setTimeout(double timeout);
+
 	bool solve(Solution& solution, std::string& message);
 
 	std::string solve(Solution& solution) {

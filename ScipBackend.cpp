@@ -185,6 +185,12 @@ ScipBackend::addConstraint(const LinearConstraint& constraint) {
 	SCIP_CALL_ABORT(SCIPreleaseCons(_scip, &c));
 }
 
+void
+ScipBackend::setTimeout(double timeout) {
+
+	SCIP_CALL_ABORT(SCIPsetParam(_scip, "limits/time", &timeout));
+}
+
 bool
 ScipBackend::solve(Solution& x, std::string& msg) {
 

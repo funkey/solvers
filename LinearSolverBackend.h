@@ -65,6 +65,11 @@ public:
 	virtual void addConstraint(const LinearConstraint& constraint) = 0;
 
 	/**
+	 * Set a timeout in seconds for subsequent solve calls.
+	 */
+	virtual void setTimeout(double timeout) = 0;
+
+	/**
 	 * Solve the problem.
 	 *
 	 * @param solution A solution object to write the solution to.

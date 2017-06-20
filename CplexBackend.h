@@ -83,6 +83,8 @@ public:
 
     void addConstraint(const LinearConstraint& constraint);
 
+    void setTimeout(double timeout) { timeout_ = timeout; }
+
     bool solve(Solution& solution,/* double& value, */ std::string& message);
 
     std::string solve(Solution& solution) {
@@ -147,6 +149,8 @@ private:
 
     // are we in the first run
     bool firstRun_;
+
+    double timeout_;
 };
 
 

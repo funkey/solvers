@@ -60,6 +60,8 @@ public:
 
 	void addConstraint(const LinearConstraint& constraint);
 
+	void setTimeout(double timeout) { _timeout = timeout; }
+
 	bool solve(Solution& solution, std::string& message);
 
 	std::string solve(Solution& solution) {
@@ -84,9 +86,6 @@ private:
 	// set the mpi focus
 	void setMIPFocus(unsigned int focus);
 
-	// set a timeout
-	void setTimeout(double timeout);
-
 	// set the number of threads to use
 	void setNumThreads(unsigned int numThreads);
 
@@ -107,6 +106,8 @@ private:
 
 	// the GRB model containing the objective and constraints
 	GRBmodel* _model;
+
+	double _timeout;
 };
 
 #endif // HAVE_GUROBI

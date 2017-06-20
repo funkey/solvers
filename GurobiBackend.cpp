@@ -50,7 +50,8 @@ GurobiBackend::GurobiBackend() :
 	_numVariables(0),
 	_numConstraints(0),
 	_env(0),
-	_model(0) {
+	_model(0),
+	_timeout(0) {
 
 	GRB_CHECK(GRBloadenv(&_env, NULL));
 }
@@ -269,6 +270,13 @@ GurobiBackend::solve(Solution& x, std::string& msg) {
 
 	GRB_CHECK(GRBupdatemodel(_model));
 
+	if (_timeout > 0) {
+
+		GRBenv* modelenv = GRBgetenv(_model);
+		GRB_CHECK(GRBsetdblparam(modelenv, GRB_DBL_PAR_TIMELIMIT, _timeout));
+		LOG_USER(gurobilog) << "using timeout of " << _timeout << "s for inference" << std::endl;
+	}
+
 	boost::timer::cpu_timer timer;
 	timer.start();
 
@@ -346,14 +354,6 @@ GurobiBackend::setMIPFocus(unsigned int focus) {
 
 	GRBenv* modelenv = GRBgetenv(_model);
 	GRB_CHECK(GRBsetintparam(modelenv, GRB_INT_PAR_MIPFOCUS, focus));
-}
-
-void
-GurobiBackend::setTimeout(double timeout) {
-
-	GRBenv* modelenv = GRBgetenv(_model);
-	GRB_CHECK(GRBsetdblparam(modelenv, GRB_DBL_PAR_TIMELIMIT, timeout));
-	LOG_USER(gurobilog) << "using timeout of " << timeout << "s for inference" << std::endl;
 }
 
 void
