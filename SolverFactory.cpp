@@ -14,14 +14,14 @@
 #include "ScipBackend.h"
 #endif
 
-LinearSolverBackend*
+std::shared_ptr<LinearSolverBackend>
 SolverFactory::createLinearSolverBackend(Preference preference) const {
 
 // by default, create a gurobi backend
 #ifdef HAVE_GUROBI
 
 	if (preference == Any || preference == Gurobi)
-		return new GurobiBackend();
+		return std::make_shared<GurobiBackend>();
 
 #endif
 
@@ -29,7 +29,7 @@ SolverFactory::createLinearSolverBackend(Preference preference) const {
 #ifdef HAVE_CPLEX
 
 	if (preference == Any || preference == Cplex)
-		return new CplexBackend();
+		return std::make_shared<CplexBackend>();
 
 #endif
 
@@ -37,7 +37,7 @@ SolverFactory::createLinearSolverBackend(Preference preference) const {
 #ifdef HAVE_SCIP
 
 	if (preference == Any || preference == Scip)
-		return new ScipBackend();
+		return std::make_shared<ScipBackend>();
 
 #endif
 
@@ -46,14 +46,14 @@ SolverFactory::createLinearSolverBackend(Preference preference) const {
 	BOOST_THROW_EXCEPTION(NoSolverException() << error_message("No linear solver available."));
 }
 
-QuadraticSolverBackend*
+std::shared_ptr<QuadraticSolverBackend>
 SolverFactory::createQuadraticSolverBackend(Preference preference) const {
 
 // by default, create a gurobi backend
 #ifdef HAVE_GUROBI
 
 	if (preference == Any || preference == Gurobi)
-			return new GurobiBackend();
+			return std::make_shared<GurobiBackend>();
 
 #endif
 
@@ -61,7 +61,7 @@ SolverFactory::createQuadraticSolverBackend(Preference preference) const {
 #ifdef HAVE_CPLEX
 
 	if (preference == Any || preference == Cplex)
-		return new CplexBackend();
+		return std::make_shared<CplexBackend>();
 
 #endif
 
