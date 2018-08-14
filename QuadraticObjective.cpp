@@ -67,3 +67,15 @@ QuadraticObjective::resize(unsigned int size) {
 
 	_coefs.resize(size, 0.0);
 }
+
+std::ostream& operator<<(std::ostream& out, const QuadraticObjective& objective) {
+
+	for (int i = 0; i < objective.size(); i++)
+		out << objective.getCoefficients()[i] << "*" << i << " ";
+
+	typedef std::map<std::pair<unsigned int, unsigned int>, double>::value_type pair_t;
+	for (pair_t p : objective.getQuadraticCoefficients())
+		out << p.second << "*" << p.first.first << "*" << p.first.second << " ";
+
+	return out;
+}
