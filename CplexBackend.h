@@ -39,12 +39,14 @@ public:
 
         Parameter() :
             mipGap(0.0001),
+            absoluteGap(false),
             mipFocus(0),
             numThreads(0),
             verbose(false) {}
 
         // The Gurobi relative optimality gap.
         double mipGap;
+        bool absoluteGap;
 
         // The Gurobi MIP focus: 0 = balanced, 1 = feasible solutions, 2 =
         // optimal solution, 3 = bound.
@@ -85,6 +87,12 @@ public:
 
     void setTimeout(double timeout) { timeout_ = timeout; }
 
+    void setOptimalityGap(double gap, bool absolute=false) {
+
+        _parameter.mipGap = gap;
+        _parameter.absoluteGap = absolute;
+    }
+
     bool solve(Solution& solution,/* double& value, */ std::string& message);
 
     std::string solve(Solution& solution) {
@@ -101,7 +109,7 @@ private:
     //////////////
 
     // set the optimality gap
-    void setMIPGap(double gap);
+    void setMIPGap(double gap, bool absolute);
 
     // set the mpi focus
     void setMIPFocus(unsigned int focus);

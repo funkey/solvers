@@ -70,6 +70,21 @@ public:
 	virtual void setTimeout(double timeout) = 0;
 
 	/**
+	 * Set the solver's optimality gap. The solver will terminate with an 
+	 * "optimal" solution as soon as the gap between the upper and lower bound 
+	 * is less than the given value times the upper bound.
+	 *
+	 * @param gap
+	 *             The optimality gap.
+	 *
+	 * @param absolute
+	 *             If set to true, a solution is considered optimal if the gap 
+	 *             between the upper and lower bound is smaller than the given 
+	 *             value.
+	 */
+	virtual void setOptimalityGap(double gap, bool absolute=false) = 0;
+
+	/**
 	 * Solve the problem.
 	 *
 	 * @param solution A solution object to write the solution to.

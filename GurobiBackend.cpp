@@ -51,7 +51,9 @@ GurobiBackend::GurobiBackend() :
 	_numConstraints(0),
 	_env(0),
 	_model(0),
-	_timeout(0) {
+	_timeout(0),
+	_gap(-1),
+	_absoluteGap(false) {
 
 	GRB_CHECK(GRBloadenv(&_env, NULL));
 }
@@ -277,6 +279,19 @@ GurobiBackend::solve(Solution& x, std::string& msg) {
 		LOG_USER(gurobilog) << "using timeout of " << _timeout << "s for inference" << std::endl;
 	}
 
+	if (_gap >= 0) {
+
+		GRBenv* modelenv = GRBgetenv(_model);
+		if (_absoluteGap)
+			GRB_CHECK(GRBsetdblparam(modelenv, GRB_DBL_PAR_MIPGAP, _gap));
+		else
+			GRB_CHECK(GRBsetdblparam(modelenv, GRB_DBL_PAR_MIPGAPABS, _gap));
+
+		LOG_USER(gurobilog)
+				<< "using " << (_absoluteGap ? "absolute" : "relative")
+				<< " optimality gap of " << _gap << std::endl;
+	}
+
 	boost::timer::cpu_timer timer;
 	timer.start();
 
@@ -340,13 +355,6 @@ GurobiBackend::solve(Solution& x, std::string& msg) {
 	x.setValue(value);
 
 	return true;
-}
-
-void
-GurobiBackend::setMIPGap(double gap) {
-
-	GRBenv* modelenv = GRBgetenv(_model);
-	GRB_CHECK(GRBsetdblparam(modelenv, GRB_DBL_PAR_MIPGAP, gap));
 }
 
 void

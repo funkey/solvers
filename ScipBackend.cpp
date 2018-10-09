@@ -191,6 +191,15 @@ ScipBackend::setTimeout(double timeout) {
 	SCIP_CALL_ABORT(SCIPsetParam(_scip, "limits/time", &timeout));
 }
 
+void
+ScipBackend::setOptimalityGap(double gap, bool absolute) {
+
+	if (absolute)
+		SCIP_CALL_ABORT(SCIPsetParam(_scip, "limits/absgap", &gap));
+	else
+		SCIP_CALL_ABORT(SCIPsetParam(_scip, "limits/gap", &gap));
+}
+
 bool
 ScipBackend::solve(Solution& x, std::string& msg) {
 

@@ -62,6 +62,12 @@ public:
 
 	void setTimeout(double timeout) { _timeout = timeout; }
 
+	void setOptimalityGap(double gap, bool absolute=false) {
+
+		_gap = gap;
+		_absoluteGap = absolute;
+	}
+
 	bool solve(Solution& solution, std::string& message);
 
 	std::string solve(Solution& solution) {
@@ -79,9 +85,6 @@ private:
 
 	// dump the current problem to a file
 	void dumpProblem(std::string filename);
-
-	// set the optimality gap
-	void setMIPGap(double gap);
 
 	// set the mpi focus
 	void setMIPFocus(unsigned int focus);
@@ -108,6 +111,10 @@ private:
 	GRBmodel* _model;
 
 	double _timeout;
+
+	double _gap;
+
+	bool _absoluteGap;
 };
 
 #endif // HAVE_GUROBI

@@ -223,7 +223,7 @@ CplexBackend::solve(Solution& x,/* double& value, */ std::string& msg) {
         cplex_ = IloCplex(model_);
         setVerbose(_parameter.verbose);
 
-        setMIPGap(_parameter.mipGap);
+        setMIPGap(_parameter.mipGap, _parameter.absoluteGap);
 
         if (_parameter.mipFocus <= 3)
             setMIPFocus(_parameter.mipFocus);
@@ -275,8 +275,12 @@ CplexBackend::solve(Solution& x,/* double& value, */ std::string& msg) {
 }
 
 void
-CplexBackend::setMIPGap(double gap) {
-     cplex_.setParam(IloCplex::EpGap, gap);
+CplexBackend::setMIPGap(double gap, bool absolute) {
+
+    if (absolute)
+        cplex_.setParam(IloCplex::EpAGap, gap);
+    else
+        cplex_.setParam(IloCplex::EpGap, gap);
 }
 
 void

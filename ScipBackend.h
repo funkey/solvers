@@ -58,6 +58,8 @@ public:
 
 	void setTimeout(double timeout);
 
+	void setOptimalityGap(double gap, bool absolute=false);
+
 	bool solve(Solution& solution, std::string& message);
 
 	std::string solve(Solution& solution) {
