@@ -7,7 +7,6 @@
 #include <sstream>
 
 #include <util/Logger.h>
-//#include <util/ProgramOptions.h>
 #include "GurobiBackend.h"
 
 #define GRB_CHECK(call) \
@@ -16,35 +15,6 @@
 using namespace logger;
 
 LogChannel gurobilog("gurobilog", "[GurobiBackend] ");
-
-//util::ProgramOption optionGurobiMIPGap(
-		//util::_module           = "inference.gurobi",
-		//util::_long_name        = "mipGap",
-		//util::_description_text = "The Gurobi relative optimality gap.",
-		//util::_default_value    = 0.0001);
-
-//util::ProgramOption optionGurobiMIPFocus(
-		//util::_module           = "inference.gurobi",
-		//util::_long_name        = "mipFocus",
-		//util::_description_text = "The Gurobi MIP focus: 0 = balanced, 1 = feasible solutions, 2 = optimal solution, 3 = bound.",
-		//util::_default_value    = 0);
-
-//util::ProgramOption optionGurobiTimeout(
-		//util::_module           = "inference.gurobi",
-		//util::_long_name        = "timeout",
-		//util::_description_text = "The number of seconds after which to stop the gurobi solver and report a sub-optimal solution.",
-		//util::_default_value    = 0);
-
-//util::ProgramOption optionGurobiNumThreads(
-		//util::_module           = "inference.gurobi",
-		//util::_long_name        = "numThreads",
-		//util::_description_text = "The number of threads to be used by Gurobi. The default (0) uses all available CPUs.",
-		//util::_default_value    = 0);
-
-//util::ProgramOption optionGurobiDumpIlp(
-		//util::_module           = "inference.gurobi",
-		//util::_long_name        = "dumpILP",
-		//util::_description_text = "Write the ILP into a file.");
 
 GurobiBackend::GurobiBackend() :
 	_numVariables(0),
@@ -95,18 +65,6 @@ GurobiBackend::initialize(
 		setVerbose(true);
 	else
 		setVerbose(false);
-
-	//setMIPGap(optionGurobiMIPGap);
-
-	//if (optionGurobiMIPFocus.as<unsigned int>() <= 3)
-		//setMIPFocus(optionGurobiMIPFocus.as<unsigned int>());
-	//else
-		//LOG_ERROR(gurobilog) << "Invalid value for MIP focus!" << std::endl;
-
-	//if (optionGurobiTimeout)
-		//setTimeout(optionGurobiTimeout.as<double>());
-
-	//setNumThreads(optionGurobiNumThreads);
 
 	// add new variables to the model
 
@@ -266,9 +224,6 @@ GurobiBackend::addConstraint(const LinearConstraint& constraint) {
 
 bool
 GurobiBackend::solve(Solution& x, std::string& msg) {
-
-	//if (optionGurobiDumpIlp)
-		//dumpProblem(optionGurobiDumpIlp);
 
 	GRB_CHECK(GRBupdatemodel(_model));
 
