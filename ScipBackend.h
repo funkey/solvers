@@ -60,6 +60,8 @@ public:
 
 	void setOptimalityGap(double gap, bool absolute=false);
 
+	void setNumThreads(unsigned int numThreads);
+
 	bool solve(Solution& solution, std::string& message);
 
 	std::string solve(Solution& solution) {

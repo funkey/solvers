@@ -68,6 +68,8 @@ public:
 		_absoluteGap = absolute;
 	}
 
+	void setNumThreads(unsigned int numThreads);
+
 	bool solve(Solution& solution, std::string& message);
 
 	std::string solve(Solution& solution) {
@@ -88,9 +90,6 @@ private:
 
 	// set the mpi focus
 	void setMIPFocus(unsigned int focus);
-
-	// set the number of threads to use
-	void setNumThreads(unsigned int numThreads);
 
 	// enable solver output
 	void setVerbose(bool verbose);

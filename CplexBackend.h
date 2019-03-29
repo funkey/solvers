@@ -93,6 +93,8 @@ public:
         _parameter.absoluteGap = absolute;
     }
 
+    void setNumThreads(unsigned int numThreads);
+
     bool solve(Solution& solution,/* double& value, */ std::string& message);
 
     std::string solve(Solution& solution) {
@@ -113,9 +115,6 @@ private:
 
     // set the mpi focus
     void setMIPFocus(unsigned int focus);
-
-    // set the number of threads to use
-    void setNumThreads(unsigned int numThreads);
 
     // create a CPLEX constraint from a linear constraint
     IloRange createConstraint(const LinearConstraint &constraint);

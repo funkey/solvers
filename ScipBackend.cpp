@@ -200,6 +200,12 @@ ScipBackend::setOptimalityGap(double gap, bool absolute) {
 		SCIP_CALL_ABORT(SCIPsetParam(_scip, "limits/gap", &gap));
 }
 
+void
+ScipBackend::setNumThreads(unsigned int numThreads) {
+
+	SCIP_CALL_ABORT(SCIPsetParam(_scip, "lp/threads", &numThreads));
+}
+
 bool
 ScipBackend::solve(Solution& x, std::string& msg) {
 

@@ -85,6 +85,15 @@ public:
 	virtual void setOptimalityGap(double gap, bool absolute=false) = 0;
 
 	/**
+	 * Set the number of threads the solver can use.
+	 *
+	 * @param numThreads
+	 *             The number of threads to use. Defaults to 0, which leaves the 
+	 *             decision to the solver.
+	 */
+	virtual void setNumThreads(unsigned int numThreads) = 0;
+
+	/**
 	 * Solve the problem.
 	 *
 	 * @param solution A solution object to write the solution to.
