@@ -2,11 +2,8 @@
 #define INFERENCE_DEFAULT_FACTORY_H__
 
 #include <memory>
-#include <util/exceptions.h>
 #include "LinearSolverBackendFactory.h"
 #include "QuadraticSolverBackendFactory.h"
-
-struct NoSolverException : virtual Exception {};
 
 class SolverFactory :
 		public LinearSolverBackendFactory,

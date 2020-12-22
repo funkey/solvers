@@ -1,7 +1,6 @@
 #ifndef INFERENCE_LINEAR_SOLVER_BACKEND_H__
 #define INFERENCE_LINEAR_SOLVER_BACKEND_H__
 
-#include <util/exceptions.h>
 #include "LinearObjective.h"
 #include "LinearConstraints.h"
 #include "Solution.h"
@@ -103,8 +102,6 @@ public:
 	 */
 	virtual bool solve(Solution& solution, std::string& message) = 0;
 };
-
-class LinearSolverBackendException : public Exception {};
 
 #endif // INFERENCE_LINEAR_SOLVER_BACKEND_H__
 

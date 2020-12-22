@@ -3,6 +3,7 @@
 #ifdef HAVE_GUROBI
 
 #include <sstream>
+#include <stdexcept>
 
 #include <util/Logger.h>
 #include "GurobiBackend.h"
@@ -343,10 +344,14 @@ GurobiBackend::dumpProblem(std::string filename) {
 void
 GurobiBackend::grbCheck(const char* call, const char* file, int line, int error) {
 
-	if (error)
-		UTIL_THROW_EXCEPTION(
-				GurobiException,
-				"Gurobi error in " << file << ":" << line << ": " << GRBgeterrormsg(_env));
+	if (error) {
+
+		std::stringstream s;
+		s << "Gurobi error in " << file << ":" << line << ": "
+		  << GRBgeterrormsg(_env);
+
+		throw std::runtime_error(s.str());
+	}
 }
 
 #endif // HAVE_GUROBI

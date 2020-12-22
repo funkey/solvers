@@ -14,9 +14,6 @@ extern "C" {
 #include "QuadraticSolverBackend.h"
 #include "Sense.h"
 #include "Solution.h"
-#include <util/exceptions.h>
-
-class GurobiException : public Exception {};
 
 /**
  * Gurobi interface to solve the following (integer) quadratic program:

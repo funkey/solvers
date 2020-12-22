@@ -1,6 +1,7 @@
 #include "SolverFactory.h"
 
 #include <config.h>
+#include <stdexcept>
 
 #ifdef HAVE_GUROBI
 #include "GurobiBackend.h"
@@ -43,7 +44,7 @@ SolverFactory::createLinearSolverBackend(Preference preference) const {
 
 // if this is not available as well, throw an exception
 
-	BOOST_THROW_EXCEPTION(NoSolverException() << error_message("No linear solver available."));
+	throw std::runtime_error("No linear solver available.");
 }
 
 std::shared_ptr<QuadraticSolverBackend>
@@ -67,5 +68,5 @@ SolverFactory::createQuadraticSolverBackend(Preference preference) const {
 
 // if this is not available as well, throw an exception
 
-	BOOST_THROW_EXCEPTION(NoSolverException() << error_message("No quadratic solver available."));
+	throw std::runtime_error("No quadratic solver available.");
 }
