@@ -1,5 +1,3 @@
-#include <boost/timer/timer.hpp>
-#include <boost/chrono.hpp>
 #include <config.h>
 
 #ifdef HAVE_SCIP
@@ -65,7 +63,7 @@ ScipBackend::initialize(
 
 		SCIP_VAR* v;
 		std::string name("x");
-		name += boost::lexical_cast<std::string>(i);
+		name += std::to_string(i);
 
 		double lb, ub;
 		SCIP_VARTYPE type = scipVarType(
@@ -159,7 +157,7 @@ ScipBackend::addConstraint(const LinearConstraint& constraint) {
 	// create the SCIP constraint lhs <= linear expr <= rhs
 	SCIP_CONS* c;
 	std::string name("c");
-	name += boost::lexical_cast<std::string>(_constraints.size());
+	name += std::to_string(_constraints.size());
 
 	// set lhs and rhs according to constraint relation
 	SCIP_Real lhs = constraint.getValue();
@@ -211,15 +209,8 @@ ScipBackend::solve(Solution& x, std::string& msg) {
 
 	LOG_ALL(sciplog) << "solving model" << std::endl;
 
-	boost::timer::cpu_timer timer;
-	timer.start();
-
 	SCIP_CALL_ABORT(SCIPpresolve(_scip));
 	SCIP_CALL_ABORT(SCIPsolve(_scip));
-
-	boost::chrono::nanoseconds ns(timer.elapsed().system + timer.elapsed().user);
-	double seconds = boost::chrono::duration<double>(ns).count();
-	x.setTime(seconds);
 
 	if (SCIPgetNSols(_scip) == 0) {
 

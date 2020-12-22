@@ -1,5 +1,3 @@
-#include <boost/timer/timer.hpp>
-#include <boost/chrono.hpp>
 #include <config.h>
 
 #ifdef HAVE_CPLEX
@@ -235,9 +233,6 @@ CplexBackend::solve(Solution& x,/* double& value, */ std::string& msg) {
 		if (timeout_ > 0)
 			cplex_.setParam(IloCplex::TiLim, timeout_);
 
-		boost::timer::cpu_timer timer;
-		timer.start();
-
         if(!cplex_.solve()) {
            LOG_USER(cplexlog) << "failed to optimize. " << cplex_.getStatus() << std::endl;
            msg = "Optimal solution *NOT* found";
@@ -246,11 +241,7 @@ CplexBackend::solve(Solution& x,/* double& value, */ std::string& msg) {
         else
             msg = "Optimal solution found";
 
-		boost::chrono::nanoseconds ns(timer.elapsed().system + timer.elapsed().user);
-		double seconds = boost::chrono::duration<double>(ns).count();
-		x.setTime(seconds);
-
-        // extract solution
+		// extract solution
         cplex_.getValues(sol_, x_);
         x.resize(_numVariables);
         for (unsigned int i = 0; i < _numVariables; i++)

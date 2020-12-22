@@ -1,5 +1,3 @@
-#include <boost/timer/timer.hpp>
-#include <boost/chrono.hpp>
 #include <config.h>
 
 #ifdef HAVE_GUROBI
@@ -247,14 +245,7 @@ GurobiBackend::solve(Solution& x, std::string& msg) {
 				<< " optimality gap of " << _gap << std::endl;
 	}
 
-	boost::timer::cpu_timer timer;
-	timer.start();
-
 	GRB_CHECK(GRBoptimize(_model));
-
-	boost::chrono::nanoseconds ns(timer.elapsed().system + timer.elapsed().user);
-	double seconds = boost::chrono::duration<double>(ns).count();
-	x.setTime(seconds);
 
 	int status;
 	GRB_CHECK(GRBgetintattr(_model, GRB_INT_ATTR_STATUS, &status));
@@ -267,7 +258,7 @@ GurobiBackend::solve(Solution& x, std::string& msg) {
 
 		if (status == GRB_TIME_LIMIT) {
 
-			msg += " (timeout";
+			msg += " (timeout)";
 
 			int numSolutions;
 			GRB_CHECK(GRBgetintattr(_model, GRB_INT_ATTR_SOLCOUNT, &numSolutions));
@@ -277,8 +268,6 @@ GurobiBackend::solve(Solution& x, std::string& msg) {
 				msg += ", no feasible solution found)";
 				return false;
 			}
-
-			msg += ", " + boost::lexical_cast<std::string>(numSolutions) + " feasible solutions found)";
 
 		} else if (status == GRB_SUBOPTIMAL) {
 
