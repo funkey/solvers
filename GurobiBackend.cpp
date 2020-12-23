@@ -5,15 +5,10 @@
 #include <sstream>
 #include <stdexcept>
 
-#include <util/Logger.h>
 #include "GurobiBackend.h"
 
 #define GRB_CHECK(call) \
 		grbCheck(#call, __FILE__, __LINE__, call)
-
-using namespace logger;
-
-LogChannel gurobilog("gurobilog", "[GurobiBackend] ");
 
 GurobiBackend::GurobiBackend() :
 	_numVariables(0),
@@ -28,8 +23,6 @@ GurobiBackend::GurobiBackend() :
 }
 
 GurobiBackend::~GurobiBackend() {
-
-	LOG_DEBUG(gurobilog) << "destructing gurobi solver..." << std::endl;
 
 	if (_model)
 		GRBfreemodel(_model);
@@ -60,10 +53,7 @@ GurobiBackend::initialize(
 
 	// set parameters
 
-	if (gurobilog.getLogLevel() >= Debug)
-		setVerbose(true);
-	else
-		setVerbose(false);
+	setVerbose(false);
 
 	// add new variables to the model
 
@@ -72,7 +62,7 @@ GurobiBackend::initialize(
 	// create arrays of  variable types and infinite lower bounds
 	char* vtypes = new char[_numVariables];
 	double* lbs = new double[_numVariables];
-	for (int i = 0; i < _numVariables; i++) {
+	for (unsigned int i = 0; i < _numVariables; i++) {
 
 		VariableType type = defaultVariableType;
 		if (specialVariableTypes.count(i))
@@ -82,8 +72,6 @@ GurobiBackend::initialize(
 		vtypes[i] = t;
 		lbs[i] = -GRB_INFINITY;
 	}
-
-	LOG_DEBUG(gurobilog) << "creating " << _numVariables << " variables" << std::endl;
 
 	GRB_CHECK(GRBaddvars(
 			_model,
@@ -120,8 +108,6 @@ GurobiBackend::setObjective(const QuadraticObjective& objective) {
 	// set the constant value of the objective
 	GRB_CHECK(GRBsetdblattr(_model, GRB_DBL_ATTR_OBJCON, objective.getConstant()));
 
-	LOG_DEBUG(gurobilog) << "setting linear coefficients" << std::endl;
-
 	GRB_CHECK(GRBsetdblattrarray(
 			_model,
 			GRB_DBL_ATTR_OBJ,
@@ -132,15 +118,10 @@ GurobiBackend::setObjective(const QuadraticObjective& objective) {
 	GRB_CHECK(GRBdelq(_model));
 
 	// set the quadratic coefficients for all pairs of variables
-	LOG_DEBUG(gurobilog) << "setting quadratic coefficients" << std::endl;
-
 	for (auto& pair : objective.getQuadraticCoefficients()) {
 
 		const std::pair<unsigned int, unsigned int>& variables = pair.first;
 		float value = pair.second;
-
-		LOG_ALL(gurobilog) << "setting Q(" << variables.first << ", " << variables.second
-						   << ") to " << value << std::endl;
 
 		if (value != 0) {
 
@@ -150,8 +131,6 @@ GurobiBackend::setObjective(const QuadraticObjective& objective) {
 			GRB_CHECK(GRBaddqpterms(_model, 1, &row, &col, &val));
 		}
 	}
-
-	LOG_ALL(gurobilog) << "updating the model" << std::endl;
 
 	GRB_CHECK(GRBupdatemodel(_model));
 }
@@ -164,22 +143,16 @@ GurobiBackend::setConstraints(const LinearConstraints& constraints) {
 	if (_numConstraints > 0) {
 
 		int* constraintIndicies = new int[_numConstraints];
-		for (int i = 0; i < _numConstraints; i++)
+		for (unsigned int i = 0; i < _numConstraints; i++)
 			constraintIndicies[i] = i;
 		GRB_CHECK(GRBdelconstrs(_model, _numConstraints, constraintIndicies));
 
 		GRB_CHECK(GRBupdatemodel(_model));
 	}
 
-	LOG_DEBUG(gurobilog) << "setting " << constraints.size() << " constraints" << std::endl;
-
 	_numConstraints = constraints.size();
 	unsigned int j = 0;
 	for (const LinearConstraint& constraint : constraints) {
-
-		if (j > 0)
-			if (j % 1000 == 0)
-				LOG_ALL(gurobilog) << "" << j << " constraints set so far" << std::endl;
 
 		addConstraint(constraint);
 
@@ -230,7 +203,6 @@ GurobiBackend::solve(Solution& x, std::string& msg) {
 
 		GRBenv* modelenv = GRBgetenv(_model);
 		GRB_CHECK(GRBsetdblparam(modelenv, GRB_DBL_PAR_TIMELIMIT, _timeout));
-		LOG_USER(gurobilog) << "using timeout of " << _timeout << "s for inference" << std::endl;
 	}
 
 	if (_gap >= 0) {
@@ -240,10 +212,6 @@ GurobiBackend::solve(Solution& x, std::string& msg) {
 			GRB_CHECK(GRBsetdblparam(modelenv, GRB_DBL_PAR_MIPGAP, _gap));
 		else
 			GRB_CHECK(GRBsetdblparam(modelenv, GRB_DBL_PAR_MIPGAPABS, _gap));
-
-		LOG_USER(gurobilog)
-				<< "using " << (_absoluteGap ? "absolute" : "relative")
-				<< " optimality gap of " << _gap << std::endl;
 	}
 
 	GRB_CHECK(GRBoptimize(_model));
@@ -285,9 +253,6 @@ GurobiBackend::solve(Solution& x, std::string& msg) {
 	}
 
 	// extract solution
-
-	LOG_ALL(gurobilog) << "extracting solution for " << _numVariables << " variables" << std::endl;
-
 	x.resize(_numVariables);
 	for (unsigned int i = 0; i < _numVariables; i++)
 		// in case of several suboptimal solutions, the best-objective solution 
@@ -337,8 +302,6 @@ GurobiBackend::dumpProblem(std::string filename) {
 	s << rand() << "_" << filename;
 
 	GRB_CHECK(GRBwrite(_model, s.str().c_str()));
-
-	LOG_USER(gurobilog) << "model dumped to " << s.str() << std::endl;
 }
 
 void

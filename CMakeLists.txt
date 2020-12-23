@@ -1,1 +1,1 @@
-define_module(solvers OBJECT LINKS gurobi? cplex? scip util)
+define_module(solvers OBJECT LINKS gurobi? cplex? scip)

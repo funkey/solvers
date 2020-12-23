@@ -13,9 +13,6 @@
 #include "Sense.h"
 #include "Solution.h"
 #include "CplexBackend.h"
-#include <util/Logger.h>
-
-logger::LogChannel cplexlog("cplexlog", "[Cplex] ");
 
 CplexBackend::CplexBackend(const Parameter& parameter) :
     _parameter(parameter),
@@ -27,11 +24,9 @@ CplexBackend::CplexBackend(const Parameter& parameter) :
     firstRun_(true),
     timeout_(0)
 {
-    LOG_DEBUG(cplexlog) << "constructing cplex solver" << std::endl;
 }
 
 CplexBackend::~CplexBackend() {
-    LOG_DEBUG(cplexlog) << "destructing cplex solver..." << std::endl;
 }
 
 void
@@ -55,10 +50,8 @@ CplexBackend::initialize(
 
     // add new variables to the model
     if (defaultVariableType == Binary) {
-        LOG_USER(cplexlog) << "creating " << _numVariables << " binary variables" << std::endl;
         x_.add(IloNumVarArray(env_, _numVariables, 0, 1, ILOBOOL));
     } else if (defaultVariableType == Continuous) {
-        LOG_USER(cplexlog) << "creating " << _numVariables << " continuous variables" << std::endl;
         x_.add(IloNumVarArray(env_, _numVariables, -IloInfinity, IloInfinity));
     } else if (defaultVariableType == Integer) {
         x_.add(IloNumVarArray(env_, _numVariables, -IloInfinity, IloInfinity, ILOINT));
@@ -75,7 +68,6 @@ CplexBackend::initialize(
 //        char t = (type == Binary ? 'B' : (type == Integer ? 'I' : 'C'));
 //        _variables[v].set(GRB_CharAttr_VType, t);
 //    }
-    LOG_USER(cplexlog) << "creating " << _numVariables << " ceofficients" << std::endl;
 }
 
 void
@@ -104,8 +96,6 @@ CplexBackend::setObjective(const QuadraticObjective& objective) {
         // set the constant value of the objective
         obj_.setConstant(objective.getConstant());
 
-        LOG_DEBUG(cplexlog) << "setting linear coefficients" << std::endl;
-
         for(size_t i = 0; i < _numVariables; i++)
         {
 			if (objective.getCoefficients()[i] == std::numeric_limits<double>::infinity())
@@ -115,7 +105,6 @@ CplexBackend::setObjective(const QuadraticObjective& objective) {
         }
 
         // set the quadratic coefficients for all pairs of variables
-        LOG_DEBUG(cplexlog) << "setting quadratic coefficients" << std::endl;
 
         typedef std::map<std::pair<unsigned int, unsigned int>, double>::const_iterator QuadCoefIt;
         for (QuadCoefIt i = objective.getQuadraticCoefficients().begin(); i != objective.getQuadraticCoefficients().end(); i++) {
@@ -134,7 +123,6 @@ CplexBackend::setObjective(const QuadraticObjective& objective) {
 
     } catch (IloCplex::Exception e) {
 
-        LOG_ERROR(cplexlog) << "CPLEX error: " << e.getMessage() << std::endl;
     }
 }
 
@@ -150,8 +138,6 @@ CplexBackend::setConstraints(const LinearConstraints& constraints) {
     _constraints.reserve(constraints.size());
 
     try {
-        LOG_USER(cplexlog) << "setting " << constraints.size() << " constraints" << std::endl;
-
         IloExtractableArray cplex_constraints(env_);
         for (LinearConstraints::const_iterator constraint = constraints.begin(); constraint != constraints.end(); constraint++) {
             IloRange linearConstraint = createConstraint(*constraint);
@@ -164,7 +150,7 @@ CplexBackend::setConstraints(const LinearConstraints& constraints) {
 
     } catch (IloCplex::Exception e) {
 
-        LOG_ERROR(cplexlog) << "error: " << e.getMessage() << std::endl;
+		std::cerr << "error: " << e.getMessage() << std::endl;
     }
 }
 
@@ -172,14 +158,12 @@ void
 CplexBackend::addConstraint(const LinearConstraint& constraint) {
 
     try {
-        LOG_ALL(cplexlog) << "adding a constraint" << std::endl;
-
-        // add to the model
+		// add to the model
         _constraints.push_back(model_.add(createConstraint(constraint)));
 
     } catch (IloCplex::Exception e) {
 
-        LOG_ERROR(cplexlog) << "error: " << e.getMessage() << std::endl;
+		std::cerr << "error: " << e.getMessage() << std::endl;
     }
 }
 
@@ -226,7 +210,7 @@ CplexBackend::solve(Solution& x,/* double& value, */ std::string& msg) {
         if (_parameter.mipFocus <= 3)
             setMIPFocus(_parameter.mipFocus);
         else
-            LOG_ERROR(cplexlog) << "Invalid value for MIP focus!" << std::endl;
+            std::cerr << "Invalid value for MIP focus!" << std::endl;
 
         setNumThreads(_parameter.numThreads);
 
@@ -234,7 +218,7 @@ CplexBackend::solve(Solution& x,/* double& value, */ std::string& msg) {
 			cplex_.setParam(IloCplex::TiLim, timeout_);
 
         if(!cplex_.solve()) {
-           LOG_USER(cplexlog) << "failed to optimize. " << cplex_.getStatus() << std::endl;
+			std::cerr << "failed to optimize. " << cplex_.getStatus() << std::endl;
            msg = "Optimal solution *NOT* found";
            return false;
         }
@@ -255,7 +239,7 @@ CplexBackend::solve(Solution& x,/* double& value, */ std::string& msg) {
 
     } catch (IloCplex::Exception& e) {
 
-        LOG_ERROR(cplexlog) << "error: " << e.getMessage() << std::endl;
+		std::cerr << "error: " << e.getMessage() << std::endl;
 
         msg = e.getMessage();
 

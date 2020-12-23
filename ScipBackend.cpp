@@ -7,12 +7,9 @@
 #include <scip/scipdefplugins.h>
 #include <scip/cons_linear.h>
 
-#include <util/Logger.h>
 #include "ScipBackend.h"
 
 using namespace logger;
-
-LogChannel sciplog("sciplog", "[ScipBackend] ");
 
 ScipBackend::ScipBackend() :
 		_scip(0) {
@@ -23,8 +20,6 @@ ScipBackend::ScipBackend() :
 }
 
 ScipBackend::~ScipBackend() {
-
-	LOG_DEBUG(sciplog) << "destructing scip solver..." << std::endl;
 
 	freeVariables();
 	freeConstraints();
@@ -47,17 +42,12 @@ ScipBackend::initialize(
 		VariableType                                defaultVariableType,
 		const std::map<unsigned int, VariableType>& specialVariableTypes) {
 
-	if (sciplog.getLogLevel() >= Debug)
-		setVerbose(true);
-	else
-		setVerbose(false);
+	setVerbose(false);
 
 	_numVariables = numVariables;
 
 	// delete previous variables
 	freeVariables();
-
-	LOG_DEBUG(sciplog) << "creating " << _numVariables << " variables" << std::endl;
 
 	for (int i = 0; i < _numVariables; i++) {
 
@@ -89,8 +79,6 @@ ScipBackend::setObjective(const LinearObjective& objective) {
 void
 ScipBackend::setObjective(const QuadraticObjective& objective) {
 
-	LOG_ALL(sciplog) << "setting objective sense" << std::endl;
-
 	// set sense of objective
 	if (objective.getSense() == Minimize)
 		SCIP_CALL_ABORT(SCIPsetObjsense(_scip, SCIP_OBJSENSE_MINIMIZE));
@@ -99,24 +87,18 @@ ScipBackend::setObjective(const QuadraticObjective& objective) {
 
 	// set the constant value of the objective
 
-	LOG_ALL(sciplog) << "setting objective offset to " << objective.getConstant() << std::endl;
-
 	double offset = SCIPgetOrigObjoffset(_scip);
 	SCIP_CALL_ABORT(SCIPaddOrigObjoffset(_scip, objective.getConstant() - offset));
 
-	LOG_DEBUG(sciplog) << "setting linear coefficients" << std::endl;
-
 	for (unsigned int i = 0; i < _numVariables; i++) {
 
-		LOG_ALL(sciplog) << "setting objective value of var " << i << " to " << objective.getCoefficients()[i] << std::endl;
 		SCIP_CALL_ABORT(SCIPchgVarObj(_scip, _variables[i], objective.getCoefficients()[i]));
 	}
 
 	if (objective.getQuadraticCoefficients().size() > 0)
-		UTIL_THROW_EXCEPTION(
-				NotYetImplemented,
-				"Quadratic objectives are not yet implemented for SCIP. "
-				"You can do so by converting min xQx into min z s.t. z >= xQx");
+		throw std::runtime_error(
+			"Quadratic objectives are not yet implemented for SCIP. "
+			"You can do so by converting min xQx into min z s.t. z >= xQx");
 }
 
 void
@@ -128,14 +110,8 @@ ScipBackend::setConstraints(const LinearConstraints& constraints) {
 	// allocate memory for new constraints
 	_constraints.reserve(constraints.size());
 
-	LOG_DEBUG(sciplog) << "setting " << constraints.size() << " constraints" << std::endl;
-
 	unsigned int j = 0;
 	for (const LinearConstraint& constraint : constraints) {
-
-		if (j > 0)
-			if (j % 1000 == 0)
-				LOG_ALL(sciplog) << "" << j << " constraints set so far" << std::endl;
 
 		addConstraint(constraint);
 
@@ -206,8 +182,6 @@ ScipBackend::setNumThreads(unsigned int numThreads) {
 
 bool
 ScipBackend::solve(Solution& x, std::string& msg) {
-
-	LOG_ALL(sciplog) << "solving model" << std::endl;
 
 	SCIP_CALL_ABORT(SCIPpresolve(_scip));
 	SCIP_CALL_ABORT(SCIPsolve(_scip));
