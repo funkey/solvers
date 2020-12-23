@@ -22,6 +22,9 @@ QuadraticObjective::getConstant() const {
 void
 QuadraticObjective::setCoefficient(unsigned int varNum, double coef) {
 
+	if (varNum >= size())
+		resize(varNum + 1);
+
 	_coefs[varNum] = coef;
 }
 
