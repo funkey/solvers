@@ -2,6 +2,7 @@
 
 #include <config.h>
 #include <stdexcept>
+#include <iostream>
 
 #ifdef HAVE_GUROBI
 #include "GurobiBackend.h"
@@ -22,7 +23,14 @@ SolverFactory::createLinearSolverBackend(Preference preference) const {
 #ifdef HAVE_GUROBI
 
 	if (preference == Any || preference == Gurobi)
-		return std::make_shared<GurobiBackend>();
+		try {
+
+			return std::make_shared<GurobiBackend>();
+
+		} catch (const std::exception& e) {
+
+			std::cout << "Could not create Gurobi backend: " << e.what() << std::endl;
+		}
 
 #endif
 
@@ -30,7 +38,14 @@ SolverFactory::createLinearSolverBackend(Preference preference) const {
 #ifdef HAVE_CPLEX
 
 	if (preference == Any || preference == Cplex)
-		return std::make_shared<CplexBackend>();
+		try {
+
+			return std::make_shared<CplexBackend>();
+
+		} catch (const std::exception& e) {
+
+			std::cout << "Could not create CPLEX backend: " << e.what() << std::endl;
+		}
 
 #endif
 
@@ -38,7 +53,15 @@ SolverFactory::createLinearSolverBackend(Preference preference) const {
 #ifdef HAVE_SCIP
 
 	if (preference == Any || preference == Scip)
-		return std::make_shared<ScipBackend>();
+
+		try {
+
+			return std::make_shared<ScipBackend>();
+
+		} catch (const std::exception& e) {
+
+			std::cout << "Could not create CPLEX backend: " << e.what() << std::endl;
+		}
 
 #endif
 
