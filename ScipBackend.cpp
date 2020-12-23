@@ -9,8 +9,6 @@
 
 #include "ScipBackend.h"
 
-using namespace logger;
-
 ScipBackend::ScipBackend() :
 		_scip(0) {
 
