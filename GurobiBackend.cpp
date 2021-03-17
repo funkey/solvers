@@ -55,8 +55,10 @@ GurobiBackend::initialize(
 
 	// create a new model
 
-	if (_model)
+	if (_model) {
 		GRBfreemodel(_model);
+		_numConstraints = 0;
+	}
 	GRB_CHECK(GRBnewmodel(_env, &_model, NULL, 0, NULL, NULL, NULL, NULL, NULL));
 
 	// set parameters
