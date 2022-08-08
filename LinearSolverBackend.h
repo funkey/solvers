@@ -94,6 +94,14 @@ public:
 	virtual void setNumThreads(unsigned int numThreads) = 0;
 
 	/**
+	 * Turn verbose logging on or off.
+	 *
+	 * @param verbose
+	 *             If set to true, verbose logging is enabled.
+	 */
+        virtual void setVerbose(bool verbose) = 0;
+
+	/**
 	 * Solve the problem.
 	 *
 	 * @param solution A solution object to write the solution to.
