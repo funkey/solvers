@@ -96,7 +96,7 @@ public:
 	 * Turn verbose logging on or off.
 	 *
 	 * @param verbose
-	 *             If set to true, verbose logging is enabled..
+	 *             If set to true, verbose logging is enabled.
 	 */
         virtual void setVerbose(bool verbose) = 0;
 
