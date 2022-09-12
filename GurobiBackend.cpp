@@ -214,10 +214,6 @@ GurobiBackend::solve(Solution& x, std::string& msg) {
 			GRB_CHECK(GRBsetdblparam(modelenv, GRB_DBL_PAR_MIPGAPABS, _gap));
 		else
 			GRB_CHECK(GRBsetdblparam(modelenv, GRB_DBL_PAR_MIPGAP, _gap));
-
-		LOG_USER(gurobilog)
-				<< "using " << (_absoluteGap ? "absolute" : "relative")
-				<< " optimality gap of " << _gap << std::endl;
 	}
 
 	GRB_CHECK(GRBoptimize(_model));
