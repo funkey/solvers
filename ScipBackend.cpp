@@ -160,22 +160,22 @@ ScipBackend::addConstraint(const LinearConstraint& constraint) {
 void
 ScipBackend::setTimeout(double timeout) {
 
-	SCIP_CALL_ABORT(SCIPsetParam(_scip, "limits/time", &timeout));
+	SCIP_CALL_ABORT(SCIPsetRealParam(_scip, "limits/time", timeout));
 }
 
 void
 ScipBackend::setOptimalityGap(double gap, bool absolute) {
 
 	if (absolute)
-		SCIP_CALL_ABORT(SCIPsetParam(_scip, "limits/absgap", &gap));
+		SCIP_CALL_ABORT(SCIPsetRealParam(_scip, "limits/absgap", gap));
 	else
-		SCIP_CALL_ABORT(SCIPsetParam(_scip, "limits/gap", &gap));
+		SCIP_CALL_ABORT(SCIPsetRealParam(_scip, "limits/gap", gap));
 }
 
 void
 ScipBackend::setNumThreads(unsigned int numThreads) {
 
-	SCIP_CALL_ABORT(SCIPsetParam(_scip, "lp/threads", &numThreads));
+	SCIP_CALL_ABORT(SCIPsetIntParam(_scip, "lp/threads", numThreads));
 }
 
 bool
