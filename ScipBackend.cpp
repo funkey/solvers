@@ -93,10 +93,38 @@ ScipBackend::setObjective(const QuadraticObjective& objective) {
 		SCIP_CALL_ABORT(SCIPchgVarObj(_scip, _variables[i], objective.getCoefficients()[i]));
 	}
 
-	if (objective.getQuadraticCoefficients().size() > 0)
-		throw std::runtime_error(
-			"Quadratic objectives are not yet implemented for SCIP. "
-			"You can do so by converting min xQx into min z s.t. z >= xQx");
+	// add quadratically constrained auxiliary variables for each quadratic
+	// coefficients
+	for (auto& pair : objective.getQuadraticCoefficients()) {
+
+		const std::pair<unsigned int, unsigned int>& variables = pair.first;
+		float value = pair.second;
+
+		if (value != 0) {
+
+			unsigned int i = variables.first;
+			unsigned int j = variables.second;
+
+			// create z_ij and add val * z_ij to objective
+
+			SCIP_VAR* z_ij;
+			std::string name("z");
+			name += std::to_string(i) + "," + std::to_string(j);
+			// z_ij cand be unbounded and real, it inherits all other
+			// bounds/integrality from the x_i * x_j = z_ij constraint below
+			double lb = -SCIPinfinity(_scip);
+			double ub =  SCIPinfinity(_scip);
+			SCIP_VARTYPE type = SCIP_VARTYPE_CONTINUOUS;
+			SCIP_CALL_ABORT(SCIPcreateVarBasic(_scip, &z_ij, name.c_str(), lb, ub, value /* obj */, type));
+			SCIP_CALL_ABORT(SCIPaddVar(_scip, z_ij));
+
+			// add constraint x_i * x_j - z_ij = 0
+			addMulEqualConstraint(i, j, z_ij);
+
+			// decrease reference count (we are done with z_ij)
+			SCIP_CALL_ABORT(SCIPreleaseVar(_scip, &z_ij));
+		}
+	}
 }
 
 void
@@ -213,6 +241,44 @@ ScipBackend::setVerbose(bool verbose) {
 		//_model.getEnv().set(GRB_IntParam_OutputFlag, 1);
 	//else
 		//_model.getEnv().set(GRB_IntParam_OutputFlag, 0);
+}
+
+void
+ScipBackend::addMulEqualConstraint(unsigned int i, unsigned int j, SCIP_VAR* z_ij) {
+
+	// add the following quadratic constraint:
+	// x_i * x_j - z_ij = 0
+
+	SCIP_VAR* x_i = _variables[i];
+	SCIP_VAR* x_j = _variables[j];
+	SCIP_Real lin_coef = -1.0;
+	SCIP_Real quad_coef = 1.0;
+
+	// create the SCIP constraint lhs <= linear expr <= rhs
+	SCIP_CONS* c;
+	std::string name("c_z");
+	name += std::to_string(i) + "," + std::to_string(j);
+
+	// set lhs and rhs according to constraint relation
+	SCIP_Real lhs = 0.0;
+	SCIP_Real rhs = 0.0;
+
+	SCIP_CALL_ABORT(SCIPcreateConsBasicQuadraticNonlinear(
+			_scip,
+			&c,
+			name.c_str(),
+			1, /* nlinvars */
+			&z_ij, /* linvars */
+			&lin_coef, /* lincoefs */
+			1, /* nquadterms */
+			&x_i, /* quadvars1 */
+			&x_j, /* quadvars2 */
+			&quad_coef, /* quadcoefs */
+			lhs,
+			rhs));
+
+	SCIP_CALL_ABORT(SCIPaddCons(_scip, c));
+	SCIP_CALL_ABORT(SCIPreleaseCons(_scip, &c));
 }
 
 void

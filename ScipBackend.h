@@ -82,6 +82,8 @@ private:
 	 */
 	void setVerbose(bool verbose);
 
+	void addMulEqualConstraint(unsigned int i, unsigned int j, SCIP_VAR* z_ij);
+
 	void freeVariables();
 
 	void freeConstraints();

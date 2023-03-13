@@ -60,7 +60,7 @@ SolverFactory::createLinearSolverBackend(Preference preference) const {
 
 		} catch (const std::exception& e) {
 
-			std::cout << "Could not create CPLEX backend: " << e.what() << std::endl;
+			std::cout << "Could not create SCIP backend: " << e.what() << std::endl;
 		}
 
 #endif
@@ -77,7 +77,15 @@ SolverFactory::createQuadraticSolverBackend(Preference preference) const {
 #ifdef HAVE_GUROBI
 
 	if (preference == Any || preference == Gurobi)
+
+		try {
+
 			return std::make_shared<GurobiBackend>();
+
+		} catch (const std::exception& e) {
+
+			std::cout << "Could not create Gurobi backend: " << e.what() << std::endl;
+		}
 
 #endif
 
@@ -85,7 +93,31 @@ SolverFactory::createQuadraticSolverBackend(Preference preference) const {
 #ifdef HAVE_CPLEX
 
 	if (preference == Any || preference == Cplex)
-		return std::make_shared<CplexBackend>();
+
+		try {
+
+			return std::make_shared<CplexBackend>();
+
+		} catch (const std::exception& e) {
+
+			std::cout << "Could not create CPLEX backend: " << e.what() << std::endl;
+		}
+
+#endif
+
+// if this is not available, create a SCIP backend
+#ifdef HAVE_SCIP
+
+	if (preference == Any || preference == Scip)
+
+		try {
+
+			return std::make_shared<ScipBackend>();
+
+		} catch (const std::exception& e) {
+
+			std::cout << "Could not create SCIP backend: " << e.what() << std::endl;
+		}
 
 #endif
 
