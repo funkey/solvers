@@ -236,11 +236,8 @@ ScipBackend::solve(Solution& x, std::string& msg) {
 void
 ScipBackend::setVerbose(bool verbose) {
 
-	// setup GRB environment
-	//if (verbose)
-		//_model.getEnv().set(GRB_IntParam_OutputFlag, 1);
-	//else
-		//_model.getEnv().set(GRB_IntParam_OutputFlag, 0);
+	int level = verbose ? 4 : 0;
+	SCIP_CALL_ABORT(SCIPsetIntParam(_scip, "display/verblevel", level));
 }
 
 void
